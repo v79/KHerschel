@@ -46,7 +46,6 @@ class BuildSlot : Entity() {
 	override fun update(year: Int, era: Era) {
 		if (action != null) {
 			status = BuildSlotStatus.IN_PROGRESS
-			println("Processing build slot action $action")
 			action?.apply {
 				val childEntity = IDProvider.getChildrenOf(this@BuildSlot.id)?.firstOrNull()
 				if (this.facility != null && childEntity == null) {
@@ -55,7 +54,6 @@ class BuildSlot : Entity() {
 				}
 				turnsLeft--
 				if (turnsLeft == 0) {
-					println("Building complete in year $year")
 					this@BuildSlot.status = BuildSlotStatus.COMPLETE
 					action = null // TODO: really want to plug this into a messaging system
 				}
@@ -76,13 +74,12 @@ enum class BuildSlotStatus {
 	COMPLETE
 }
 
-class Facility(val name: String, val buildTime: Int) : Entity() {
+class Facility(val name: String, private val buildTime: Int) : Entity() {
 	var health: Int = 0
 	var status: FacilityStatus = FacilityStatus.PENDING
 	private var buildTimeRemaining = buildTime
 
 	override fun update(year: Int, era: Era) {
-		println("FACILITY: UPDATE")
 		if (status == FacilityStatus.PENDING) {
 			// start building
 			status = FacilityStatus.UNDER_CONSTRUCTION
@@ -98,12 +95,12 @@ class Facility(val name: String, val buildTime: Int) : Entity() {
 	}
 
 	override fun toString(): String {
-		return "${super.toString()}: $status, health: $health"
+		return "${super.toString()}: '$name' $status, health: $health"
 	}
 
 }
 
-enum class FacilityStatus() {
+enum class FacilityStatus {
 	PENDING,
 	UNDER_CONSTRUCTION,
 	OPERATING,

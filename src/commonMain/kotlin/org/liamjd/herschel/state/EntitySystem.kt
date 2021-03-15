@@ -86,6 +86,10 @@ object IDProvider {
 			}
 		}
 	}
+
+	fun reset() {
+		idMap.clear()
+	}
 }
 
 class EntityUpdateSystem {

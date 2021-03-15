@@ -1,0 +1,137 @@
+package org.liamjd.herschel.ui
+
+import com.soywiz.klock.milliseconds
+import com.soywiz.korge.animate.animate
+import com.soywiz.korge.input.mouse
+import com.soywiz.korge.tween.duration
+import com.soywiz.korge.tween.get
+import com.soywiz.korge.tween.tween
+import com.soywiz.korge.ui.UIView
+import com.soywiz.korge.view.*
+import com.soywiz.korge.view.filter.PageFilter
+import com.soywiz.korge.view.tween.moveBy
+import com.soywiz.korim.color.Colors
+import com.soywiz.korim.color.RGBA
+
+
+val actionCardRootPosX = 160.0
+val actionCardRootPosY = views.virtualHeightDouble - 50
+var anyCardPeeking = false
+var anyCardExpanded = false
+val cardWidth = 120.0
+val cardHeight = 200.0
+val cardFilter = PageFilter()
+val actionCardArray = arrayListOf<Card>()
+for (actionCard in CardColour.values()) {
+//			val c = Card(actionCard.color,actionCard.name)
+//			c.position((actionCardStartPosX + (actionCard.ordinal * cardWidth)),actionCardStartPosY)
+//			c.addFilter(cardFilter)
+	val c = card(
+		actionCard.color,
+		actionCard.name
+	)
+	val actionCardStartX = (actionCardRootPosX + (actionCard.ordinal * cardWidth))
+	c.xy(actionCardStartX, actionCardRootPosY)
+	c.filter = cardFilter
+	c.mouse {
+		onOver {
+			if (!anyCardPeeking) {
+				println("mouse over - peaking: ${c.peaking}")
+				animate {
+					c.peaking = true
+					anyCardPeeking = true
+					c.moveBy(0.0, -100.0)
+				}
+			}
+		}
+
+		onOut {
+			if (c.peaking && !c.expanded) {
+				animate {
+					c.moveTo(actionCardStartX, actionCardRootPosY)
+					c.peaking = false
+					anyCardPeeking = false
+				}
+				c.setSize(cardWidth.toDouble(),cardHeight.toDouble())
+			}
+			if(c.expanded) {
+				// do nothing
+			}
+		}
+
+		onClick {
+			if(!c.expanded && c.peaking) {
+				c.expanded = true
+				println("expanded = ${c.expanded}")
+				/*animate {
+					parallel {
+						c.moveTo(views.virtualWidthDouble /2 - 60,views.virtualHeightDouble / 2 )
+						c.scaleBy(1.1,1.1)
+					}
+				}*/
+				println("attempting to change width ${c.width} to (cardWidth*2) = ${cardWidth * 2}")
+/*						tween(c::x[views.virtualWidthDouble /2 - (cardWidth / 2)],time = 1000.milliseconds)
+						tween(c::scale[2.0],time= 1000.milliseconds)*/
+				/*tween(
+					c::x[views.virtualWidthDouble /2 - (cardWidth / 2)].duration(1000.milliseconds),
+					c::y[views.virtualHeightDouble / 2].duration(1000.milliseconds),
+					c::width[(cardWidth*2)].duration(500.milliseconds),
+					c::height[(cardHeight * 2)].duration(500.milliseconds),
+				)*/
+				tween(
+					c::x[views.virtualWidthDouble /2 - (cardWidth / 2)].duration(1000.milliseconds),
+					c::y[views.virtualHeightDouble / 2].duration(1000.milliseconds),
+					c::scale[2.0].duration(500.milliseconds),
+				)
+
+			} else {
+				tween(
+					c::scale[0.5].duration(500.milliseconds),
+					c::x[actionCardStartX].duration(500.milliseconds),
+					c::y[actionCardRootPosY].duration(500.milliseconds)
+				)
+				/*animate {
+					parallel {
+						c.scaleBy((1 / 1.1),(1 / 1.1),0.5.seconds)
+						c.moveTo(actionCardStartX, actionCardRootPosY,0.5.seconds)
+					}
+				}*/
+				c.expanded = false
+				anyCardPeeking = false
+				anyCardExpanded = false
+				println("expanded = ${c.expanded}")
+//						c.position((actionCardStartPosX + (actionCard.ordinal * cardWidth)), actionCardStartPosY)
+			}
+		}
+	}
+	actionCardArray.add(c)
+}
+}
+}
+
+class Card(color: RGBA, name: String) : UIView(120.0, 200.0) {
+	private val cardBack = RoundRect(120.0, 200.0, fill = color, rx = 20.0)
+	var peaking = false
+	var expanded = false
+
+	init {
+		addChild(cardBack)
+	}
+
+	suspend fun peak() {
+		moveBy(20.0, -200.0)
+	}
+
+
+}
+
+fun Container.card(color: RGBA, name: String, callback: @ViewDslMarker Card.() -> Unit = {}) =
+	Card(color, name).addTo(this)
+
+enum class CardColour(val color: RGBA) {
+	BLUE(Colors.BLUE),
+	GREEN(Colors.GREEN),
+	ORANGE(Colors.ORANGE),
+	PINK(Colors.PINK),
+	YELLOW(Colors.YELLOW)
+}

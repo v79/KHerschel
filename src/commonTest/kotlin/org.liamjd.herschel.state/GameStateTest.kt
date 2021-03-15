@@ -4,6 +4,11 @@ import kotlin.test.*
 
 class GameStateTest {
 
+	@BeforeTest
+	fun `clear IDProvider`() {
+		IDProvider.reset()
+	}
+
 	@Test
 	fun `set up initial game state, no entities`() {
 		// setup
@@ -151,7 +156,7 @@ class GameStateTest {
 	}
 
 	@Test
-	fun `pending 1-build action is processed at the end of the turn and removed from the queue`() {
+	fun `pending 1-cost action is processed at the end of the turn and removed from the queue`() {
 		// setup
 		val gs = GameState(2050)
 		val planet = Planet(1, "My planet")
@@ -173,7 +178,7 @@ class GameStateTest {
 	}
 
 	@Test
-	fun `pending 2-build action is processed at the end of the turn and removed from the queue`() {
+	fun `pending 2-cost action is processed at the end of the turn and removed from the queue`() {
 		// setup
 		val gs = GameState(2050)
 		val planet = Planet(1, "My planet")
@@ -195,7 +200,7 @@ class GameStateTest {
 	}
 
 	@Test
-	fun `pending 1-build action completes at the end of the turn and the action is done`() {
+	fun `pending 1-cost action completes at the end of the turn and the action is done`() {
 		// setup
 		val gs = GameState(2050)
 		val planet = TestPlanet()
@@ -216,7 +221,7 @@ class GameStateTest {
 	}
 
 	@Test
-	fun `pending 2-build action does not complete at the end of the turn and turnsLeft is decremented`() {
+	fun `pending 2-cost action does not complete at the end of the turn and turnsLeft is decremented`() {
 		// setup
 		val gs = GameState(2050)
 		val planet = TestPlanet()
@@ -240,7 +245,7 @@ class GameStateTest {
 	}
 
 	@Test
-	fun `pending 2-build action is completed at the end of two turns and is removed`() {
+	fun `pending 2-cost action is completed at the end of two turns and is removed`() {
 		// setup
 		val gs = GameState(2050)
 		val planet = TestPlanet()
@@ -262,7 +267,7 @@ class GameStateTest {
 	}
 
 	@Test
-	fun `pending 2-build action is added to a BuildSlot on a planet and is completed at the end of two turns and is removed`() {
+	fun `pending 2-cost action is added to a BuildSlot on a planet and is completed at the end of two turns and is removed`() {
 		// setup
 		val gs = GameState(2050)
 		val planet = Planet(0, "My Planet")
@@ -378,7 +383,54 @@ class GameStateTest {
 				}
 			}
 		}
+	}
 
+	@Test
+	fun `multiple build orders can run in parallel`() {
+		// setup
+		val gs = GameState(2050)
+		val planet = Planet(name = "Small Planet")
+		val buildSlot1 = planet.addBuildSlot()
+		val buildSlot2 = planet.addBuildSlot()
+		gs.entitySystem += planet
+		gs.entitySystem += buildSlot1
+		gs.entitySystem += buildSlot2
+		val lab = Facility("Research Laboratory", 1)
+		val uni = Facility("University",1)
+		gs.entitySystem += lab
+		gs.entitySystem += uni
+		val buildLab = GameOrder("build lab", 1, GameActionType.BUILD_ITEM, buildSlot1, lab)
+		val buildUni = GameOrder("build university", 2, GameActionType.BUILD_ITEM, buildSlot2, uni)
+		val buildLabResult = gs.orderSystem.addOrder(buildLab)
+		val buildUniResult = gs.orderSystem.addOrder(buildUni)
+
+		// execute
+		gs.nextTurn()
+		gs.nextTurn()
+
+		// verify
+		assertTrue(buildLabResult)
+		assertTrue(buildUniResult)
+		assertEquals(2052, gs.year)
+		val foundPlanet = IDProvider.getEntity<Planet>(planet.id)
+		assertNotNull(foundPlanet) { p ->
+			assertNull(p.action)
+			assertNull(p.getFreeBuildSlot()?.action)
+
+			val slots = IDProvider.getChildrenOf(p.id)
+			assertNotNull(slots) {
+				slots?.forEach { s ->
+					val buildings = IDProvider.getChildrenOf(s.id)
+					assertNotNull(buildings)
+					assertEquals(1,buildings.size)
+					assertNull(s.action)
+					val f = buildings.first() as Facility
+					assertNotNull(f)
+					assertEquals(100,f.health)
+					assertEquals(FacilityStatus.OPERATING,f.status)
+				}
+			}
+		}
 		IDProvider.debugEntityTree()
 	}
 }
