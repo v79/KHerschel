@@ -1,34 +1,46 @@
 package org.liamjd.herschel.state
 
+import com.soywiz.korio.async.runBlockingNoSuspensions
+import com.soywiz.korio.file.std.resourcesVfs
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import org.liamjd.herschel.science.technology.Technology
+
 class GameState(startingYear: Int) {
-	var year: Int = startingYear
-	var era = Era.EARTH
+
+	val format = Json { prettyPrint = true; encodeDefaults = true }
+
+	val gm = GameModel(startingYear)
+	val techTree: List<Technology>
 
 	val entitySystem: EntityUpdateSystem = EntityUpdateSystem()
 	val orderSystem: OrderSystem = OrderSystem()
 
 	fun nextTurn() {
-		orderSystem.processOrderQueue(year,era)
-		entitySystem.process<Entity>(year,era)
-		year++
+		orderSystem.processOrderQueue(gm.year,gm.era)
+		entitySystem.process<Entity>(gm.year,gm.era)
+		gm.year++
+
+		if(gm.year == 2055) {
+			techTree.find { it.key == "1_quantumComputer" }?.researched = true
+		}
 	}
 
 	init {
+		println("Loading Tech Tree")
+		val techTreeJson = runBlockingNoSuspensions {
+			resourcesVfs["technologies/techs.json"].readString()
+		}
+		techTree = Json.decodeFromString(techTreeJson)
+	}
 
+	fun getAvailableTechnologies(era: Era): List<Technology> {
+		return techTree.filter { !it.researched }
 	}
 
 }
 
-/**
- * The game will progress through different eras, and at each stage the map will zoom out to reveal more of the solar system.
- * For now, we will stop at the full solar system view; eventual target is to take this galactic.
- */
-enum class Era {
-	EARTH,
-	MARS,
-	INNER_PLANETS,
-	SOLAR_SYSTEM
-}
+
 
 /**
  * A GameAction is an ongoing (but short-lived) activity in response to an order. It will take [turnsLeft] game turns to complete.

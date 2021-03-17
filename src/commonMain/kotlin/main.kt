@@ -3,15 +3,15 @@ import com.soywiz.korge.scene.Module
 import com.soywiz.korge.scene.Scene
 import com.soywiz.korinject.AsyncInjector
 import com.soywiz.korma.geom.SizeInt
-import org.liamjd.herschel.state.GameState
 import org.liamjd.herschel.MainMenu
 import org.liamjd.herschel.SolarSystem
+import org.liamjd.herschel.state.GameState
 import kotlin.reflect.KClass
 
 suspend fun main() = Korge(Korge.Config(module = HerschelModule))
 
 object HerschelModule : Module() {
-	override val mainScene: KClass<out Scene> = SolarSystem::class
+	override val mainScene: KClass<out Scene> = MainMenu::class
 	override val size: SizeInt = SizeInt(1024,768)
 	override val title: String = "Herschel"
 

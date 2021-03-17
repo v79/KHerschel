@@ -1,0 +1,76 @@
+[
+    {
+        "key": "1_quantumComputer",
+        "name": "Quantum Computing",
+        "description": "Quantum computers won't replace your laptop or your phone, but for certain computational problems, they will turn the intractable into the trivial.",
+        "techLevel": "LEVEL_1",
+        "parents": [
+        ],
+        "enablesFacilities": [
+        ],
+        "deprecatesFacilities": [
+        ],
+        "enablesActions": [
+        ],
+        "deprecatesActions": [
+        ],
+        "spritePath": "",
+        "researched": false
+    },
+    {
+        "key": "1_roomTempSuperConductor",
+        "name": "Room Temperature Superconductors",
+        "description": "Superconductors have always required freezing temperatures - a few degrees above absolute zero.\nThese new metamaterials will revolutionise power transmission, computing and who knows what else",
+        "techLevel": "LEVEL_1",
+        "parents": [
+            "1_quantumComputer"
+        ],
+        "enablesFacilities": [
+        ],
+        "deprecatesFacilities": [
+        ],
+        "enablesActions": [
+        ],
+        "deprecatesActions": [
+        ],
+        "spritePath": "",
+        "researched": false
+    },
+    {
+        "key": "2_telemereRejuv",
+        "name": "Telemere Rejuvenation",
+        "description": "With every cell division, our telemeres get shorter.\nEventually, they are too small to cut again, and we die. Can we trick a little extra length to the telemeres, and extend our lives a little?",
+        "techLevel": "LEVEL_1",
+        "parents": [
+        ],
+        "enablesFacilities": [
+        ],
+        "deprecatesFacilities": [
+        ],
+        "enablesActions": [
+        ],
+        "deprecatesActions": [
+        ],
+        "spritePath": "",
+        "researched": false
+    },
+    {
+        "key": "2_suspendedAnimation",
+        "name": "Suspended Animation",
+        "description": "Some animals do it, or something similar.\nBut can we put a person to sleep for 100 years?",
+        "techLevel": "LEVEL_1",
+        "parents": [
+            "2_telemereRejuv"
+        ],
+        "enablesFacilities": [
+        ],
+        "deprecatesFacilities": [
+        ],
+        "enablesActions": [
+        ],
+        "deprecatesActions": [
+        ],
+        "spritePath": "",
+        "researched": false
+    }
+]
