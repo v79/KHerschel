@@ -20,7 +20,7 @@
     {
         "key": "1_roomTempSuperConductor",
         "name": "Room Temperature Superconductors",
-        "description": "Superconductors have always required freezing temperatures - a few degrees above absolute zero.\nThese new metamaterials will revolutionise power transmission, computing and who knows what else",
+        "description": "Superconductors have always required freezing temperatures - a few degrees above absolute zero. These new metamaterials will revolutionise power transmission, computing and who knows what else",
         "techLevel": "LEVEL_1",
         "parents": [
             "1_quantumComputer"
@@ -57,7 +57,7 @@
     {
         "key": "2_suspendedAnimation",
         "name": "Suspended Animation",
-        "description": "Some animals do it, or something similar.\nBut can we put a person to sleep for 100 years?",
+        "description": "Some animals do it, or something similar. But can we put a person to sleep for 100 years?",
         "techLevel": "LEVEL_1",
         "parents": [
             "2_telemereRejuv"

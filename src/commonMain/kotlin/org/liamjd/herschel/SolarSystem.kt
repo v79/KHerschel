@@ -12,6 +12,7 @@ import com.soywiz.korim.color.Colors
 import org.liamjd.herschel.science.technology.Technology
 import org.liamjd.herschel.state.GameModel
 import org.liamjd.herschel.state.GameState
+import org.liamjd.herschel.ui.*
 
 class SolarSystem(private val gameState: GameState) : Scene() {
 
@@ -19,8 +20,8 @@ class SolarSystem(private val gameState: GameState) : Scene() {
 	private var gm: GameModel = gameState.gm
 	var availableTechs: List<Technology>? = null
 
-	@KorgeExperimental
 	override suspend fun Container.sceneInit() {
+		val tooltipContainer = Container().apply { name = "tooltips" }
 		val centerY = views.virtualHeightDouble / 2
 		views.gameWindow.title = "Herschel: Solar System"
 
@@ -50,6 +51,11 @@ class SolarSystem(private val gameState: GameState) : Scene() {
 			}
 		}
 
+		val wrap = wrappableText("Fly me to the moon and let me sing among the starts,... jupiter and mars. SuperCALLIfragilisticexpaladocious.", wrapWidth = 180.0,textSize = 14.0, color = Colors.PINK, wrapAlignment = WrapAlignment.LEFT) {
+			position(100,100)
+			addTooltip("From Mary Poppins", backgroundColor = Colors.LIGHTGRAY, container = tooltipContainer)
+		}
+
 
 		val techContainer = container() {
 			solidRect(200.0, 300.0, Colors.SLATEBLUE) {
@@ -61,12 +67,12 @@ class SolarSystem(private val gameState: GameState) : Scene() {
 				var techY = 200
 				availableTechs?.apply {
 					for (tech in this) {
-						text(tech.name) {
+						wrappableText(tech.name, wrapWidth = 180.0, wrapAlignment = WrapAlignment.LEFT) {
 							position(techX, techY)
-							val desc = text(tech.description) {
-								color = Colors.YELLOW
+							addTooltip(tech.description, color = Colors.YELLOW, container = tooltipContainer)
+						/*	val desc = Tooltip(text = tech.description, textSize = 14.0, wrapWidth = 160.0 , color = Colors.YELLOW, backgroundColor = Colors.DARKGRAY , wrapAlignment = WrapAlignment.LEFT).apply {
 								visible = false
-								position(this@text.x + 10.0, this@text.y + 10)
+								position(this@wrappableText.x + 10.0, this@wrappableText.y + 10)
 							}
 							onOver {
 								desc.visible = true
@@ -74,13 +80,14 @@ class SolarSystem(private val gameState: GameState) : Scene() {
 							onOut {
 								desc.visible = false
 							}
+							addChild(desc)*/
+						techY = (techY + (this.lineCount * textSize)).toInt() + 20
 						}
-						techY += 20
 					}
 
 			}
 		}
+		addChild(tooltipContainer)
 	}
-
 }
 
